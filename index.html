@@ -281,7 +281,7 @@
             flex-shrink: 0;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .avatar-ai { background-image: url('https://api.dicebear.com/7.x/avataaars/svg?seed=XuTao&backgroundColor=ffdfbf'); background-color: #fff; margin-right: 10px;}
+        .avatar-ai { background-image: url('https://api.dicebear.com/9.x/avataaars/svg?seed=Felix&accessories=glasses&clothing=blazerAndShirt'); background-color: #fff; margin-right: 10px;}
         .avatar-user { background-image: url('https://api.dicebear.com/7.x/notionists/svg?seed=Student'); background-color: #eee; margin-left: 10px;}
         
         .bubble {
@@ -548,7 +548,7 @@
             <div class="nav-left" onclick="app.navigateTo('study')">
                 <svg class="icon" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
             </div>
-            <div class="nav-title">AI 对话测评</div>
+            <div class="nav-title">题前背 涛哥挑战赛</div>
         </header>
 
         <div class="chat-scroll-area" id="chat-messages" style="margin-top: calc(var(--header-height) + env(safe-area-inset-top));">
@@ -569,13 +569,6 @@
             <div id="btn-record" class="btn-hold-talk">按住 说话</div>
             <input id="input-text-mode" type="text" class="input-text-mode hidden" placeholder="输入你的回答..." />
 
-            <!-- Right: Skip Button (Removed) -->
-            <!-- 
-            <div class="btn-capsule" onclick="app.skipQuestion()">
-                <span>跳过</span>
-                <svg class="icon" style="width:16px; height:16px;" viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
-            </div> 
-            -->
             <div style="width: 32px;"></div> <!-- Spacer -->
         </div>
     </div>
@@ -627,7 +620,11 @@
             { id: 1, title: '考点 1：马克思主义的鲜明特征', content: '马克思主义具有鲜明的科学性、革命性、实践性、人民性和发展性。其中，实践性是马克思主义理论区别于其他理论的显著特征。' },
             { id: 2, title: '考点 2：马克思主义的当代价值', content: '观察当代世界变化的认识工具；指引当代中国发展的行动指南；引领人类社会进步的科学真理。' }
         ],
-        chatIntro: '你好同学！请背诵一下“马克思主义的鲜明特征”有哪些？'
+        questions: [
+            '你好同学！请背诵一下“马克思主义的鲜明特征”有哪些？',
+            '回答得不错！下一题：马克思主义的当代价值体现在哪三个方面？',
+            '最后一题：请简述马克思主义的科学内涵。'
+        ]
     };
 
     // --- State ---
@@ -636,7 +633,8 @@
         isRecording: false,
         isPlaying: false,
         speed: 1.0,
-        isTextInputMode: false
+        isTextInputMode: false,
+        currentQuestionIndex: 0
     };
 
     // --- Controller ---
@@ -645,7 +643,7 @@
             app.renderOutline();
             app.renderStudyList();
             // Init chat with AI question
-            app.addMessage('ai', MOCK_DATA.chatIntro);
+            app.addMessage('ai', MOCK_DATA.questions[0]);
             app.bindEvents();
         },
 
@@ -653,6 +651,17 @@
             document.querySelectorAll('.page-container, #page-chat').forEach(el => el.classList.add('hidden'));
             document.getElementById(`page-${pageId}`).classList.remove('hidden');
             window.scrollTo(0, 0);
+            
+            // If navigating to chat, reset if finished
+            if(pageId === 'chat' && state.currentQuestionIndex >= MOCK_DATA.questions.length) {
+                state.currentQuestionIndex = 0;
+                document.getElementById('chat-messages').innerHTML = `
+                    <div style="text-align: center; font-size: 12px; color: #999; margin: 10px 0;">
+                        💡 评分仅基于关键词命中，请以标准答案为准
+                    </div>
+                `;
+                app.addMessage('ai', MOCK_DATA.questions[0]);
+            }
         },
 
         // --- Render: Outline ---
@@ -758,15 +767,30 @@
             }
         },
 
-        skipQuestion: (isAfterAnswer = false) => {
-            const text = isAfterAnswer 
-                ? '好的。请听下一题：马克思主义的当代价值体现在哪三个方面？' 
-                : '好的，我们跳过这题。请听下一题：马克思主义的当代价值体现在哪三个方面？';
-            app.addMessage('ai', text);
+        nextQuestion: (isAfterAnswer = false) => {
+            state.currentQuestionIndex++;
+            
+            if (state.currentQuestionIndex < MOCK_DATA.questions.length) {
+                const nextQ = MOCK_DATA.questions[state.currentQuestionIndex];
+                const prefix = isAfterAnswer ? '好的。' : '好的，我们跳过这题。';
+                // Only add prefix if not the first question (which is handled by init)
+                app.addMessage('ai', prefix + '请听下一题：' + nextQ);
+            } else {
+                app.finish();
+            }
+        },
+        
+        finish: () => {
+            app.addMessage('ai', '太棒了！你已经完成了本章所有题目的背诵挑战。🎉');
+            // Navigate back after delay or user click
+            setTimeout(() => {
+                app.navigateTo('study');
+            }, 2000);
         },
 
         retryQuestion: () => {
-            app.addMessage('ai', '好的，请重新回答上一题。');
+            const currentQ = MOCK_DATA.questions[state.currentQuestionIndex];
+            app.addMessage('ai', '好的，请重新回答：' + currentQ);
         },
 
         addMessage: (type, text, score = null) => {
@@ -777,6 +801,11 @@
             let contentHtml = `<div class="bubble bubble-${type}">${text}</div>`;
             let actionsHtml = '';
             let scoreHtml = '';
+            
+            // Check if this is the last question
+            const isLastQuestion = state.currentQuestionIndex === MOCK_DATA.questions.length - 1;
+            const nextBtnText = isLastQuestion ? '🏁 完成挑战' : '➡️ 下一题';
+            const skipBtnText = isLastQuestion ? '➡️ 跳过，完成' : '➡️ 跳过，下一题';
             
             if (isUser) {
                 // User message wrapper with Edit button on the LEFT
@@ -790,7 +819,6 @@
                 `;
             } else if (score) {
                 // Scenario B: Feedback with Score
-                // 1. Score Stamp
                 scoreHtml = `
                     <div class="score-stamp-container">
                         <div class="score-value">${score.replace(/[^0-9]/g, '')}</div>
@@ -798,7 +826,6 @@
                     </div>
                 `;
                 
-                // 2. Content
                 contentHtml = `
                     <div class="bubble bubble-ai" style="padding-right: 20px;">
                         <div>${text}</div>
@@ -806,23 +833,34 @@
                     </div>
                 `;
 
-                // 3. Actions (Retry + Next)
+                // Actions (Retry + Next/Finish)
                 actionsHtml = `
                     <div class="bubble-footer">
                         <button class="btn-bubble-action" onclick="app.retryQuestion()">🔄 再背一次</button>
-                        <button class="btn-bubble-action primary" onclick="app.skipQuestion(true)">➡️ 下一题</button>
+                        <button class="btn-bubble-action primary" onclick="app.nextQuestion(true)">${nextBtnText}</button>
                     </div>
                 `;
             } else {
-                // Scenario A: Just Question -> Show 'Next Question' button
+                // Scenario A: Just Question
                 contentHtml = `
                     <div class="bubble bubble-ai">${text}</div>
                 `;
-                actionsHtml = `
-                    <div class="bubble-footer">
-                        <button class="btn-bubble-action" onclick="app.skipQuestion(false)">➡️ 跳过，下一题</button>
-                    </div>
-                `;
+                
+                // Only show skip button if it's a question (and not the final congratulation message)
+                if (text.indexOf('🎉') === -1) {
+                    let skipButtonHtml = '';
+                    if (isLastQuestion) {
+                         skipButtonHtml = `<button class="btn-bubble-action" style="color: #bbb; border-color: #eee; background: #f9f9f9;" onclick="alert('这是最后一道题，请坚持完成挑战！')">🚫 这是最后一道题，无法跳过哦</button>`;
+                    } else {
+                         skipButtonHtml = `<button class="btn-bubble-action" onclick="app.nextQuestion(false)">➡️ 跳过，下一题</button>`;
+                    }
+
+                    actionsHtml = `
+                        <div class="bubble-footer">
+                            ${skipButtonHtml}
+                        </div>
+                    `;
+                }
             }
 
             const div = document.createElement('div');
