@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>徐涛政治·考前背诵</title>
+    <style>
+        /* --- 1. Design Tokens & Reset --- */
+        :root {
+            --primary: #FFD000;
+            --primary-dark: #E6BB00;
+            --bg-body: #F7F8FA;
+            --bg-card: #FFFFFF;
+            --text-main: #333333;
+            --text-secondary: #858E99;
+            --text-white: #FFFFFF;
+            --success: #07C160;
+            --divider: #EEEEEE;
+            
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            
+            --shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+            --safe-bottom: env(safe-area-inset-bottom);
+            --header-height: 44px;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.5;
+            overflow-x: hidden;
+            height: 100vh;
+        }
+
+        /* --- 2. Utilities --- */
+        .hidden { display: none !important; }
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .justify-center { justify-content: center; }
+        .text-sm { font-size: 14px; }
+        .text-xs { font-size: 12px; }
+        .font-bold { font-weight: 600; }
+        .text-gray { color: var(--text-secondary); }
+        .p-4 { padding: 16px; }
+        
+        /* Icons */
+        .icon { width: 20px; height: 20px; fill: currentColor; }
+        .icon-lg { width: 24px; height: 24px; }
+
+        /* --- 3. Components --- */
+        /* Header */
+        .nav-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 0.5px solid rgba(0,0,0,0.05);
+            z-index: 100;
+            padding-top: env(safe-area-inset-top);
+            box-sizing: content-box; /* Handle safe area height */
+        }
+        .nav-left { position: absolute; left: 16px; display: flex; align-items: center; bottom: 10px; cursor: pointer; }
+        .nav-title { font-size: 17px; font-weight: 600; bottom: 10px; position: relative;}
+
+        /* Buttons */
+        .btn {
+            border: none;
+            outline: none;
+            background: none;
+            cursor: pointer;
+            font-size: 16px;
+            transition: transform 0.1s;
+        }
+        .btn:active { transform: scale(0.96); }
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--text-main);
+            font-weight: 600;
+            padding: 12px 24px;
+            border-radius: 50px;
+            width: 100%;
+            box-shadow: 0 4px 12px rgba(255, 208, 0, 0.3);
+        }
+        .btn-capsule {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-size: 13px;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        /* Tags */
+        .tag {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            margin-right: 6px;
+        }
+        .tag-yellow { background: rgba(255, 208, 0, 0.2); color: #B38F00; }
+        .tag-gray { background: #F0F2F5; color: #858E99; }
+        .tag-badge {
+            background: #fff;
+            color: #FF8800;
+            border: 1px solid #FF8800;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 10px;
+            margin-right: 8px;
+            font-weight: 600;
+        }
+
+        /* --- 4. Page Specifics --- */
+        .page-container {
+            padding-top: calc(var(--header-height) + env(safe-area-inset-top));
+            padding-bottom: calc(80px + var(--safe-bottom));
+            min-height: 100vh;
+        }
+
+        /* Home: Outline List */
+        .chapter-group-header {
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+            border-bottom: 1px solid #eee;
+            margin-top: 10px;
+        }
+        .chapter-group-header:first-child { margin-top: 0; }
+        .chapter-group-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .chapter-list {
+            padding: 12px 16px;
+            background: #F7F8FA;
+            transition: max-height 0.3s ease-out;
+            overflow: hidden;
+        }
+        .chapter-list.collapsed {
+            display: none;
+        }
+        
+        .chapter-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            margin-bottom: 12px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #F0F0F0;
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        .progress-value {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        /* Study: Player Control Bar */
+        .player-control-bar {
+            position: sticky;
+            top: calc(var(--header-height) + env(safe-area-inset-top));
+            background: #fff;
+            padding: 8px 16px;
+            z-index: 90;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .player-left { display: flex; align-items: center; gap: 12px; }
+        .btn-play-pause {
+            width: 32px; height: 32px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: #333;
+        }
+        .btn-speed {
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            background: #f0f0f0;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        .player-info {
+            font-size: 13px;
+            color: #666;
+            flex: 1;
+            margin-left: 12px;
+        }
+
+        .knowledge-card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+        .knowledge-card-body {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #444;
+            text-align: justify;
+        }
+        .play-btn-circle {
+            width: 32px;
+            height: 32px;
+            background: #F5F5F5;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+        }
+
+        /* Chat: Assessment */
+        #page-chat { background: #EDEDED; height: 100vh; display: flex; flex-direction: column; padding-bottom: 0;}
+        .chat-scroll-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            padding-bottom: 20px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .message-row {
+            display: flex;
+            margin-bottom: 20px;
+            align-items: flex-start;
+            flex-direction: column; /* Allow buttons below bubble */
+            position: relative; /* For score positioning */
+        }
+        .message-content-wrapper {
+            display: flex;
+            align-items: flex-start;
+            width: 100%;
+            position: relative;
+        }
+        .message-content-wrapper.user { flex-direction: row-reverse; }
+        
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background-size: cover;
+            background-position: center;
+            flex-shrink: 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .avatar-ai { background-image: url('https://api.dicebear.com/7.x/avataaars/svg?seed=XuTao&backgroundColor=ffdfbf'); background-color: #fff; margin-right: 10px;}
+        .avatar-user { background-image: url('https://api.dicebear.com/7.x/notionists/svg?seed=Student'); background-color: #eee; margin-left: 10px;}
+        
+        .bubble {
+            max-width: 70%;
+            padding: 10px 14px;
+            border-radius: 8px;
+            position: relative;
+            font-size: 15px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+        .bubble-ai {
+            background: #fff;
+            border-top-left-radius: 2px;
+        }
+        .bubble-user {
+            background: #95EC69; /* Wechat Green for user, or use Primary var(--primary) */
+            background: var(--primary);
+            border-top-right-radius: 2px;
+            color: #000;
+        }
+        
+        /* Edit & Score UI */
+        .message-actions {
+            display: flex;
+            align-items: center;
+            margin-right: 8px;
+            opacity: 0.6;
+        }
+        .edit-btn { padding: 8px; cursor: pointer;}
+        
+        /* NEW Score Visual Style */
+        .score-stamp-container {
+            position: absolute;
+            top: -15px;
+            right: -10px;
+            width: 70px;
+            height: 70px;
+            background: #fff;
+            border: 3px solid #FF8800;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #FF8800;
+            transform: rotate(15deg);
+            box-shadow: 0 4px 10px rgba(255, 136, 0, 0.2);
+            z-index: 10;
+        }
+        .score-value {
+            font-size: 24px;
+            font-weight: 800;
+            line-height: 1;
+        }
+        .score-label {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Bubble Footer Actions */
+        .bubble-footer {
+            margin-top: 8px;
+            margin-left: 50px; /* Align with bubble start (40px avatar + 10px margin) */
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .btn-bubble-action {
+            background: #fff;
+            border: 1px solid #E0E0E0;
+            border-radius: 18px;
+            padding: 6px 14px;
+            font-size: 13px;
+            color: #555;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .btn-bubble-action:active {
+            background: #f5f5f5;
+            transform: scale(0.98);
+        }
+        .btn-bubble-action.primary {
+            border-color: var(--primary);
+            color: #B38F00;
+            background: rgba(255, 208, 0, 0.1);
+        }
+
+        .chat-input-area {
+            background: #F7F7F7;
+            border-top: 1px solid #DCDCDC;
+            padding: 10px 16px;
+            padding-bottom: calc(10px + var(--safe-bottom));
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        .btn-hold-talk {
+            flex: 1;
+            height: 40px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            -webkit-user-select: none;
+            cursor: pointer;
+        }
+        .btn-hold-talk:active, .btn-hold-talk.recording {
+            background: #dedede;
+            color: #555;
+        }
+        .input-text-mode {
+            flex: 1;
+            height: 40px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 0 10px;
+            font-size: 15px;
+        }
+
+        /* Editing Mode textarea */
+        .edit-textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 14px;
+            margin-bottom: 8px;
+            resize: none;
+        }
+        .edit-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+        .btn-mini {
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            background: #fff;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+        .btn-mini-primary {
+            background: #333;
+            color: #fff;
+            border: none;
+        }
+
+        /* Recording Overlay */
+        .recording-overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 150px;
+            height: 150px;
+            background: rgba(0,0,0,0.7);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            z-index: 1000;
+            pointer-events: none;
+        }
+        .recording-wave {
+            display: flex;
+            gap: 4px;
+            height: 30px;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .wave-bar {
+            width: 4px;
+            background: var(--primary);
+            animation: wave 0.5s infinite ease-in-out;
+        }
+        .wave-bar:nth-child(2) { animation-delay: 0.1s; }
+        .wave-bar:nth-child(3) { animation-delay: 0.2s; }
+        .wave-bar:nth-child(4) { animation-delay: 0.1s; }
+        
+        @keyframes wave {
+            0%, 100% { height: 10px; }
+            50% { height: 30px; }
+        }
+
+        /* Fixed Bottom Btn for Study Page */
+        .fixed-bottom-btn {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 12px 16px;
+            padding-bottom: calc(12px + var(--safe-bottom));
+            background: #fff;
+            border-top: 1px solid #eee;
+            z-index: 90;
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <!-- === PAGE 1: HOME (Outline) === -->
+    <div id="page-home" class="page-container" style="padding-top: calc(var(--header-height) + env(safe-area-inset-top));">
+        <header class="nav-header">
+            <div class="nav-title">题前背</div>
+        </header>
+
+        <div id="outline-container">
+            <!-- Content Injected via JS -->
+        </div>
+    </div>
+
+    <!-- === PAGE 2: STUDY (Content) === -->
+    <div id="page-study" class="page-container hidden">
+        <header class="nav-header">
+            <div class="nav-left" onclick="app.navigateTo('home')">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+            </div>
+            <div class="nav-title">马原·第一章</div>
+        </header>
+
+        <div class="player-control-bar">
+            <div class="player-left">
+                <div class="btn-play-pause" onclick="app.togglePlay()">
+                    <svg id="icon-play" class="icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    <svg id="icon-pause" class="icon hidden" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                </div>
+                <div class="player-info">
+                    <div style="font-weight:600; color:#333;">顺序播放全章</div>
+                    <div class="text-xs text-gray">00:00 / 12:45</div>
+                </div>
+            </div>
+            <div class="btn-speed" onclick="app.toggleSpeed()" id="btn-speed">1.0x</div>
+        </div>
+
+        <div class="p-4" id="study-list">
+            <!-- Content Injected via JS -->
+        </div>
+
+        <div class="fixed-bottom-btn">
+            <button class="btn btn-primary" onclick="app.navigateTo('chat')">我背好了，去挑战</button>
+        </div>
+    </div>
+
+    <!-- === PAGE 3: CHAT (Assessment) === -->
+    <div id="page-chat" class="hidden">
+        <header class="nav-header">
+            <div class="nav-left" onclick="app.navigateTo('study')">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+            </div>
+            <div class="nav-title">AI 对话测评</div>
+        </header>
+
+        <div class="chat-scroll-area" id="chat-messages" style="margin-top: calc(var(--header-height) + env(safe-area-inset-top));">
+            <!-- Messages Injected via JS -->
+            <div style="text-align: center; font-size: 12px; color: #999; margin: 10px 0;">
+                💡 评分仅基于关键词命中，请以标准答案为准
+            </div>
+        </div>
+
+        <div class="chat-input-area">
+            <!-- Left: Keyboard Icon -->
+            <div class="btn" onclick="app.toggleInputMode()">
+                <svg id="icon-keyboard" class="icon text-gray" viewBox="0 0 24 24"><path d="M20 5H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-9 3h2v2h-2V8zm0 3h2v2h-2v-2zM8 8h2v2H8V8zm0 3h2v2H8v-2zm-1 2H5v-2h2v2zm0-3H5V8h2v2zm9 7H8v-2h8v2zm0-4h-2v-2h2v2zm0-3h-2V8h2v2zm3 3h-2v-2h2v2zm0-3h-2V8h2v2z"/></svg>
+                <svg id="icon-voice" class="icon text-gray hidden" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.66 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+            </div>
+            
+            <!-- Center: Hold to Talk / Input -->
+            <div id="btn-record" class="btn-hold-talk">按住 说话</div>
+            <input id="input-text-mode" type="text" class="input-text-mode hidden" placeholder="输入你的回答..." />
+
+            <!-- Right: Skip Button (Removed) -->
+            <!-- 
+            <div class="btn-capsule" onclick="app.skipQuestion()">
+                <span>跳过</span>
+                <svg class="icon" style="width:16px; height:16px;" viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+            </div> 
+            -->
+            <div style="width: 32px;"></div> <!-- Spacer -->
+        </div>
+    </div>
+
+    <!-- Recording Overlay -->
+    <div id="recording-overlay" class="recording-overlay hidden">
+        <div class="recording-wave">
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+        </div>
+        <div class="text-sm">正在听...</div>
+    </div>
+</div>
+
+<script>
+    // --- Data ---
+    const MOCK_DATA = {
+        subjects: [
+            {
+                id: 'my', title: '马克思主义基本原理', expanded: true,
+                chapters: [
+                    { id: '1-1', title: '第一章：马克思主义导论', tag: '必背', progress: 35, lastPlayed: true, subtitle: '3个核心考点 · 预计10分钟' },
+                    { id: '1-2', title: '第二章：世界的物质性及发展规律', tag: '高频', progress: 0, lastPlayed: false, subtitle: '5个核心考点 · 预计15分钟' },
+                    { id: '1-3', title: '第三章：实践与认识及其发展规律', tag: '重点', progress: 0, lastPlayed: false, subtitle: '4个核心考点 · 预计12分钟' }
+                ]
+            },
+            {
+                id: 'mzt', title: '毛泽东思想和中国特色社会主义理论体系概论', expanded: false,
+                chapters: [
+                    { id: '2-1', title: '第一章：毛泽东思想及其历史地位', tag: '基础', progress: 0, lastPlayed: false, subtitle: '2个核心考点 · 预计8分钟' }
+                ]
+            },
+            {
+                id: 'xjp', title: '习近平新时代中国特色社会主义思想概论', expanded: false,
+                chapters: []
+            },
+            {
+                id: 'zg', title: '中国近现代史纲要', expanded: false,
+                chapters: []
+            },
+            {
+                id: 'sx', title: '思想道德与法治', expanded: false,
+                chapters: []
+            }
+        ],
+        studyPoints: [
+            { id: 1, title: '考点 1：马克思主义的鲜明特征', content: '马克思主义具有鲜明的科学性、革命性、实践性、人民性和发展性。其中，实践性是马克思主义理论区别于其他理论的显著特征。' },
+            { id: 2, title: '考点 2：马克思主义的当代价值', content: '观察当代世界变化的认识工具；指引当代中国发展的行动指南；引领人类社会进步的科学真理。' }
+        ],
+        chatIntro: '你好同学！请背诵一下“马克思主义的鲜明特征”有哪些？'
+    };
+
+    // --- State ---
+    const state = {
+        chatHistory: [],
+        isRecording: false,
+        isPlaying: false,
+        speed: 1.0,
+        isTextInputMode: false
+    };
+
+    // --- Controller ---
+    const app = {
+        init: () => {
+            app.renderOutline();
+            app.renderStudyList();
+            // Init chat with AI question
+            app.addMessage('ai', MOCK_DATA.chatIntro);
+            app.bindEvents();
+        },
+
+        navigateTo: (pageId) => {
+            document.querySelectorAll('.page-container, #page-chat').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`page-${pageId}`).classList.remove('hidden');
+            window.scrollTo(0, 0);
+        },
+
+        // --- Render: Outline ---
+        renderOutline: () => {
+            const container = document.getElementById('outline-container');
+            container.innerHTML = MOCK_DATA.subjects.map((sub, index) => `
+                <div>
+                    <div class="chapter-group-header" onclick="app.toggleGroup(${index})">
+                        <div class="chapter-group-title">${sub.title}</div>
+                        <svg class="icon text-gray" style="transform: rotate(${sub.expanded ? '180deg' : '0deg'}); transition: transform 0.2s;" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+                    </div>
+                    <div class="chapter-list ${sub.expanded ? '' : 'collapsed'}" id="group-${index}">
+                        ${sub.chapters.length > 0 ? sub.chapters.map(ch => `
+                            <div class="card chapter-item" onclick="app.navigateTo('study')">
+                                <div style="flex: 1;">
+                                    <div class="flex items-center mb-1">
+                                        <span class="tag tag-yellow">${ch.tag}</span>
+                                        <span class="font-bold text-sm">${ch.title}</span>
+                                    </div>
+                                    <div class="text-xs text-gray mb-2">${ch.subtitle}</div>
+                                    <div class="flex items-center text-xs text-gray">
+                                        ${ch.lastPlayed ? `<span class="tag-badge">上次练到这</span>` : ''}
+                                        <span style="flex:1;"></span>
+                                        <span>${ch.progress}%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-value" style="width: ${ch.progress}%;"></div>
+                                    </div>
+                                </div>
+                                <div style="margin-left: 12px;">
+                                    <svg class="icon text-gray" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+                                </div>
+                            </div>
+                        `).join('') : '<div class="text-xs text-gray p-4 text-center">暂无内容</div>'}
+                    </div>
+                </div>
+            `).join('');
+        },
+
+        toggleGroup: (index) => {
+            MOCK_DATA.subjects[index].expanded = !MOCK_DATA.subjects[index].expanded;
+            app.renderOutline();
+        },
+
+        // --- Render: Study ---
+        renderStudyList: () => {
+            const container = document.getElementById('study-list');
+            container.innerHTML = MOCK_DATA.studyPoints.map(item => `
+                <div class="card">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="knowledge-card-title">${item.title}</div>
+                            <div class="knowledge-card-body">${item.content}</div>
+                        </div>
+                        <div class="play-btn-circle" style="flex-shrink:0; margin-left:12px;">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        },
+
+        togglePlay: () => {
+            state.isPlaying = !state.isPlaying;
+            const iconPlay = document.getElementById('icon-play');
+            const iconPause = document.getElementById('icon-pause');
+            if (state.isPlaying) {
+                iconPlay.classList.add('hidden');
+                iconPause.classList.remove('hidden');
+            } else {
+                iconPlay.classList.remove('hidden');
+                iconPause.classList.add('hidden');
+            }
+        },
+
+        toggleSpeed: () => {
+            const speeds = [1.0, 1.5, 2.0];
+            const currentIndex = speeds.indexOf(state.speed);
+            const nextIndex = (currentIndex + 1) % speeds.length;
+            state.speed = speeds[nextIndex];
+            document.getElementById('btn-speed').innerText = state.speed.toFixed(1) + 'x';
+        },
+
+        // --- Chat & Interaction ---
+        toggleInputMode: () => {
+            state.isTextInputMode = !state.isTextInputMode;
+            const btnRecord = document.getElementById('btn-record');
+            const inputText = document.getElementById('input-text-mode');
+            const iconKeyboard = document.getElementById('icon-keyboard');
+            const iconVoice = document.getElementById('icon-voice');
+
+            if (state.isTextInputMode) {
+                btnRecord.classList.add('hidden');
+                inputText.classList.remove('hidden');
+                inputText.focus();
+                iconKeyboard.classList.add('hidden');
+                iconVoice.classList.remove('hidden');
+            } else {
+                btnRecord.classList.remove('hidden');
+                inputText.classList.add('hidden');
+                iconKeyboard.classList.remove('hidden');
+                iconVoice.classList.add('hidden');
+            }
+        },
+
+        skipQuestion: (isAfterAnswer = false) => {
+            const text = isAfterAnswer 
+                ? '好的。请听下一题：马克思主义的当代价值体现在哪三个方面？' 
+                : '好的，我们跳过这题。请听下一题：马克思主义的当代价值体现在哪三个方面？';
+            app.addMessage('ai', text);
+        },
+
+        retryQuestion: () => {
+            app.addMessage('ai', '好的，请重新回答上一题。');
+        },
+
+        addMessage: (type, text, score = null) => {
+            const container = document.getElementById('chat-messages');
+            const msgId = Date.now();
+            const isUser = type === 'user';
+            
+            let contentHtml = `<div class="bubble bubble-${type}">${text}</div>`;
+            let actionsHtml = '';
+            let scoreHtml = '';
+            
+            if (isUser) {
+                // User message wrapper with Edit button on the LEFT
+                contentHtml = `
+                    <div class="message-actions">
+                        <div class="edit-btn" onclick="app.enableEdit('${msgId}')">
+                            <svg class="icon" style="width:16px; height:16px;" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                        </div>
+                    </div>
+                    <div class="bubble bubble-user" id="msg-content-${msgId}">${text}</div>
+                `;
+            } else if (score) {
+                // Scenario B: Feedback with Score
+                // 1. Score Stamp
+                scoreHtml = `
+                    <div class="score-stamp-container">
+                        <div class="score-value">${score.replace(/[^0-9]/g, '')}</div>
+                        <div class="score-label">SCORE</div>
+                    </div>
+                `;
+                
+                // 2. Content
+                contentHtml = `
+                    <div class="bubble bubble-ai" style="padding-right: 20px;">
+                        <div>${text}</div>
+                        ${scoreHtml}
+                    </div>
+                `;
+
+                // 3. Actions (Retry + Next)
+                actionsHtml = `
+                    <div class="bubble-footer">
+                        <button class="btn-bubble-action" onclick="app.retryQuestion()">🔄 再背一次</button>
+                        <button class="btn-bubble-action primary" onclick="app.skipQuestion(true)">➡️ 下一题</button>
+                    </div>
+                `;
+            } else {
+                // Scenario A: Just Question -> Show 'Next Question' button
+                contentHtml = `
+                    <div class="bubble bubble-ai">${text}</div>
+                `;
+                actionsHtml = `
+                    <div class="bubble-footer">
+                        <button class="btn-bubble-action" onclick="app.skipQuestion(false)">➡️ 跳过，下一题</button>
+                    </div>
+                `;
+            }
+
+            const div = document.createElement('div');
+            div.className = `message-row ${type}`;
+            div.id = `msg-row-${msgId}`;
+            div.innerHTML = `
+                <div class="message-content-wrapper ${type}">
+                    <div class="avatar avatar-${type}"></div>
+                    ${contentHtml}
+                </div>
+                ${actionsHtml}
+            `;
+            
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        },
+
+        bindEvents: () => {
+            const btnRecord = document.getElementById('btn-record');
+            const overlay = document.getElementById('recording-overlay');
+            let recordTimer;
+
+            // Touch Start (Start Recording)
+            const startRecord = (e) => {
+                e.preventDefault();
+                state.isRecording = true;
+                btnRecord.classList.add('recording');
+                btnRecord.innerText = '松开 发送';
+                overlay.classList.remove('hidden');
+            };
+
+            // Touch End (Send)
+            const endRecord = (e) => {
+                e.preventDefault();
+                if (!state.isRecording) return;
+                state.isRecording = false;
+                btnRecord.classList.remove('recording');
+                btnRecord.innerText = '按住 说话';
+                overlay.classList.add('hidden');
+
+                // Simulate processing delay
+                setTimeout(() => {
+                    const simulatedText = "马克思主义具有鲜明的科学性、革命性、实践性...呃...还有人民性。";
+                    app.addMessage('user', simulatedText);
+                    
+                    // Simulate AI Response
+                    setTimeout(() => {
+                        app.addMessage('ai', '回答得不错！提到了科学性、革命性、实践性和人民性。但是漏掉了“发展性”哦。', '85分');
+                    }, 800);
+                }, 1500);
+            };
+
+            btnRecord.addEventListener('touchstart', startRecord);
+            btnRecord.addEventListener('touchend', endRecord);
+            // Mouse events for desktop testing
+            btnRecord.addEventListener('mousedown', startRecord);
+            btnRecord.addEventListener('mouseup', endRecord);
+
+            // Text Input Handling
+            const inputText = document.getElementById('input-text-mode');
+            inputText.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && inputText.value.trim() !== '') {
+                    const text = inputText.value;
+                    inputText.value = '';
+                    app.addMessage('user', text);
+                    setTimeout(() => {
+                        app.addMessage('ai', '文字输入也收到啦！回答非常准确，100分！', '100分');
+                    }, 800);
+                }
+            });
+        },
+
+        // CRITICAL: Edit Feature
+        enableEdit: (msgId) => {
+            const bubble = document.getElementById(`msg-content-${msgId}`);
+            // Check if already editing
+            if (bubble.querySelector('.edit-textarea')) return;
+
+            const currentText = bubble.innerText;
+            
+            // Replace bubble content with textarea
+            bubble.innerHTML = `
+                <textarea class="edit-textarea" id="input-${msgId}">${currentText}</textarea>
+                <div class="edit-actions">
+                    <button class="btn btn-mini" onclick="app.cancelEdit('${msgId}', '${currentText}')">取消</button>
+                    <button class="btn btn-mini btn-mini-primary" onclick="app.submitEdit('${msgId}')">提交</button>
+                </div>
+            `;
+            
+            // Focus textarea
+            setTimeout(() => {
+                const textarea = document.getElementById(`input-${msgId}`);
+                if(textarea) {
+                    textarea.focus();
+                    textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+                }
+            }, 100);
+        },
+
+        cancelEdit: (msgId, originalText) => {
+            const bubble = document.getElementById(`msg-content-${msgId}`);
+            bubble.innerText = originalText;
+        },
+
+        submitEdit: (msgId) => {
+            const input = document.getElementById(`input-${msgId}`);
+            const newText = input.value;
+            const bubble = document.getElementById(`msg-content-${msgId}`);
+            
+            // 1. Update User Text
+            bubble.innerText = newText;
+            
+            // 2. Add loading feedback
+            const container = document.getElementById('chat-messages');
+            const loadingId = Date.now();
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'message-row ai';
+            loadingDiv.id = `loading-${loadingId}`;
+            loadingDiv.innerHTML = `
+                <div class="message-content-wrapper ai">
+                    <div class="avatar avatar-ai"></div>
+                    <div class="bubble bubble-ai" style="color:#999;">重新评分中...</div>
+                </div>
+            `;
+            container.appendChild(loadingDiv);
+            container.scrollTop = container.scrollHeight;
+
+            // 3. Simulate Re-scoring
+            setTimeout(() => {
+                document.getElementById(`loading-${loadingId}`).remove();
+                app.addMessage('ai', '修正后非常完美！五大特征都回答正确了。', '100分');
+            }, 1200);
+        }
+    };
+
+    // Run
+    app.init();
+</script>
+</body>
+</html>
